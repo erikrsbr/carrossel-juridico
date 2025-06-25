@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Carrossel Institucional</title>
+  <style>
+    /* ... (seus estilos originais aqui, sem alteração) ... */
+  </style>
+</head>
+<body>
+
+<h3>Acesse também:</h3>
+
+<div class="carousel-wrapper">
+  <div class="carousel">
+    <div class="carousel-track" id="carouselTrack"></div>
+  </div>
+  <div class="nav-buttons">
+    <button id="prevBtn" aria-label="Anterior">&#10094;</button>
+    <button id="nextBtn" aria-label="Próximo">&#10095;</button>
+  </div>
+  <div class="dots" id="dotsContainer"></div>
+</div>
+
+<script>
+  // === IMPORT SIMULADO (TOP) ===
+  const imagens = [
+    { nome: 'DIRETORIA CORPORATIVA', arquivo: 'DC.jpg' },
+    { nome: 'GERÊNCIA SÊNIOR JURÍDICA', arquivo: 'GSJ.jpg' },
+    { nome: 'GERÊNCIA DE MARKETING E COMUNICAÇÃO', arquivo: 'MKT.jpg' },
+    { nome: 'GERÊNCIA SÊNIOR CONTÁBIL E FINANCEIRA', arquivo: 'GSCF.jpg' },
+    { nome: 'GERÊNCIA SÊNIOR DE RECURSOS HUMANOS', arquivo: 'GSRH.jpg' },
+    { nome: 'GERÊNCIA SÊNIOR DE TECNOLOGIA DA INFORMAÇÃO', arquivo: 'GSTI.jpg' },
+    { nome: 'GERÊNCIA DE PLANEJAMENTO E CONTROLADORIA', arquivo: 'GPC.jpg' },
+    { nome: 'NÚCLEO DE APOIO CORPORATIVO', arquivo: 'NAC2.jpg' },
+    { nome: 'EDITORA', arquivo: 'Editora.png' },
+    { nome: 'GERÊNCIA DE FACILITIES', arquivo: 'GF.jpg' },
+    { nome: 'GERÊNCIA DE COMPRAS', arquivo: 'GC.jpg' },
+    { nome: 'GERÊNCIA SÊNIOR DE OBRAS', arquivo: 'GSO.jpg' }
+  ];
+
+  // === GERAÇÃO DINÂMICA DOS CARDS ===
+  const carouselTrack = document.getElementById('carouselTrack');
+  imagens.forEach(img => {
+    const card = document.createElement('div');
+    card.classList.add('card');
+    card.innerHTML = `
+      <a href="#" target="_blank">
+        <img src="img/${img.arquivo}" alt="${img.nome}">
+        <div class="card-title">${img.nome}</div>
+      </a>
+    `;
+    carouselTrack.appendChild(card);
+  });
+
+  // === CARROSSEL ===
+  const track = document.querySelector('.carousel-track');
+  const nextButton = document.getElementById('nextBtn');
+  const prevButton = document.getElementById('prevBtn');
+  const dotsContainer = document.getElementById('dotsContainer');
+  let currentIndex = 0;
+  let cards = [];
+
+  function getVisibleCardCount() {
+    const carouselWidth = document.querySelector('.carousel').offsetWidth;
+    const cardWidth = track.querySelector('.card').offsetWidth + 20;
+    return Math.floor(carouselWidth / cardWidth);
+  }
+
+  function updateMaxIndex() {
+    cards = Array.from(track.children);
+    maxIndex = cards.length - getVisibleCardCount();
+  }
+
+  function updateCarousel() {
+    const cardWidth = cards[0].offsetWidth + 20;
+    track.style.transform = 'translateX(-' + cardWidth * currentIndex + 'px)';
+    Array.from(dotsContainer.children).forEach(dot => dot.classList.remove('active'));
+    if (dotsContainer.children[currentIndex]) {
+      dotsContainer.children[currentIndex].classList.add('active');
+    }
+  }
+
+  function createDots() {
+    dotsContainer.innerHTML = '';
+    const visibleCards = getVisibleCardCount();
+    const totalPages = Math.ceil(cards.length / visibleCards);
+    for (let i = 0; i < totalPages; i++) {
+      const dot = document.createElement('span');
+      dot.classList.add('dot');
+      if (i === 0) dot.classList.add('active');
+      dot.addEventListener('click', () => {
+        currentIndex = i;
+        updateCarousel();
+      });
+      dotsContainer.appendChild(dot);
+    }
+  }
+
+  nextButton.addEventListener('click', () => {
+    if (currentIndex < maxIndex) currentIndex++;
+    updateCarousel();
+  });
+
+  prevButton.addEventListener('click', () => {
+    if (currentIndex > 0) currentIndex--;
+    updateCarousel();
+  });
+
+  window.addEventListener('resize', () => {
+    updateMaxIndex();
+    createDots();
+    updateCarousel();
+  });
+
+  updateMaxIndex();
+  createDots();
+</script>
+
+</body>
+</html>
